@@ -34,7 +34,7 @@ def pm(mean: float, std: float) -> str:
     return f"{mean:.3f} ± {std:.3f}"
 
 
-def fold_auc_chart(result: dict) -> go.Figure:
+def fold_auc_chart(result: dict, title: str) -> go.Figure:
     aucs = [f["auc"] for f in result["folds"]]
     fig = go.Figure(
         go.Scatter(
@@ -45,7 +45,7 @@ def fold_auc_chart(result: dict) -> go.Figure:
             hovertemplate="%{x}<br>AUC %{y:.3f}<extra></extra>",
         )
     )
-    fig.update_layout(height=260, margin={"l": 10, "r": 10, "t": 30, "b": 10}, title="ROC AUC in each fold")
+    fig.update_layout(height=260, margin={"l": 10, "r": 10, "t": 30, "b": 10}, title=title)
     fig.update_yaxes(range=[0.4, 1.02], title="ROC AUC")
     return fig
 
@@ -126,7 +126,7 @@ def image_chart(df_patient: pd.DataFrame, proba: np.ndarray, label: int, title: 
     return fig
 
 
-st.set_page_config(page_title="Same data, two ways to split", layout="wide")
+st.set_page_config(page_title="Patient-level data leakage in an imaging model", layout="wide")
 
 data = load()
 df: pd.DataFrame = data["df"]
@@ -134,7 +134,7 @@ config: DataConfig = data["config"]
 normal = data["normal"]
 control = data["control"]
 
-st.title("Same data, two ways to split")
+st.title("Patient-level data leakage in an imaging model")
 st.write(
     f"**Same data, same model. Split by image: AUC {normal['image']['auc_mean']:.2f}. "
     f"Split by patient: {normal['patient']['auc_mean']:.2f}.**"
@@ -144,7 +144,7 @@ st.caption(
     "the same patient in both training and test, so the model can recognise the patient instead of the finding."
 )
 
-st.subheader("Two ways to split the same data")
+st.subheader("Scores")
 for col, scheme in zip(st.columns(2), SCHEMES):
     r = normal[scheme]
     with col:
@@ -154,7 +154,6 @@ for col, scheme in zip(st.columns(2), SCHEMES):
         b.metric(f"Accuracy ({N_SPLITS}-fold mean ± SD)", pm(r["accuracy_mean"], r["accuracy_std"]))
         shared = ", ".join(f"{f['shared_patients']}/{f['test_patients']}" for f in r["folds"])
         st.write(f"Test patients also in training (folds 1–5): {shared}")
-        st.plotly_chart(fold_auc_chart(r), width="stretch", key=f"folds-{scheme}")
 
 st.subheader("Prediction for each patient")
 st.caption(
@@ -247,6 +246,13 @@ with st.expander("Why do patient-level scores swing?"):
         "those patients in training, so the folds look stable. That stability is part of the leak, not a sign of "
         "a reliable model."
     )
+    for col, scheme in zip(st.columns(2), SCHEMES):
+        with col:
+            st.plotly_chart(
+                fold_auc_chart(normal[scheme], f"{SCHEMES[scheme]}: ROC AUC in each fold"),
+                width="stretch",
+                key=f"folds-{scheme}",
+            )
 
 with st.expander("About this data"):
     counts = df.groupby("patient_id").size()
