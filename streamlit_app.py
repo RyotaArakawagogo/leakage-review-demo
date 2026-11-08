@@ -94,9 +94,9 @@ def per_patient_chart(summary: pd.DataFrame, title: str) -> go.Figure:
     threshold_line(fig)
     fig.update_layout(
         title=title,
-        height=400,
+        height=300,
         margin={"l": 10, "r": 10, "t": 40, "b": 10},
-        legend={"orientation": "h", "y": -0.22},
+        legend={"orientation": "h", "yanchor": "top", "y": -0.45},
     )
     fig.update_xaxes(
         categoryorder="array",
@@ -105,7 +105,7 @@ def per_patient_chart(summary: pd.DataFrame, title: str) -> go.Figure:
         tickangle=-90,
         tickfont={"size": 9},
     )
-    fig.update_yaxes(range=[0, 1], title="Mean predicted probability of finding")
+    fig.update_yaxes(range=[0, 1], title="Mean P(finding)")
     return fig
 
 
@@ -148,10 +148,9 @@ st.subheader("Scores")
 for col, scheme in zip(st.columns(2), SCHEMES):
     r = normal[scheme]
     with col:
-        st.markdown(f"#### {SCHEMES[scheme]}")
         a, b = st.columns(2)
-        a.metric(f"ROC AUC ({N_SPLITS}-fold mean ± SD)", pm(r["auc_mean"], r["auc_std"]))
-        b.metric(f"Accuracy ({N_SPLITS}-fold mean ± SD)", pm(r["accuracy_mean"], r["accuracy_std"]))
+        a.metric(f"{SCHEMES[scheme]} · ROC AUC ({N_SPLITS}-fold mean ± SD)", pm(r["auc_mean"], r["auc_std"]))
+        b.metric(f"{SCHEMES[scheme]} · Accuracy ({N_SPLITS}-fold mean ± SD)", pm(r["accuracy_mean"], r["accuracy_std"]))
         shared = ", ".join(f"{f['shared_patients']}/{f['test_patients']}" for f in r["folds"])
         st.write(f"Test patients also in training (folds 1–5): {shared}")
 
