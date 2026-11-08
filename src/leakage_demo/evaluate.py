@@ -41,9 +41,14 @@ def evaluate(df: pd.DataFrame, scheme: Scheme, n_splits: int = N_SPLITS) -> dict
     X = df[FEATURE_NAMES].to_numpy()
     y = df["label"].to_numpy()
     folds = []
-    for train_idx, test_idx in split_indices(df, scheme, n_splits):
+    # Out-of-fold predictions: each image's probability from the fold where it was in test.
+    oof_proba = np.full(len(df), np.nan)
+    oof_fold = np.full(len(df), -1)
+    for fold, (train_idx, test_idx) in enumerate(split_indices(df, scheme, n_splits)):
         model = make_model().fit(X[train_idx], y[train_idx])
         proba = model.predict_proba(X[test_idx])[:, 1]
+        oof_proba[test_idx] = proba
+        oof_fold[test_idx] = fold
         folds.append(
             {
                 "auc": roc_auc_score(y[test_idx], proba),
@@ -57,6 +62,8 @@ def evaluate(df: pd.DataFrame, scheme: Scheme, n_splits: int = N_SPLITS) -> dict
     return {
         "scheme": scheme,
         "folds": folds,
+        "oof_proba": oof_proba,
+        "oof_fold": oof_fold,
         # Sample standard deviation over the folds (ddof=1).
         "auc_mean": float(auc.mean()),
         "auc_std": float(auc.std(ddof=1)),
