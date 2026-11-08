@@ -65,6 +65,12 @@ The tests (`pytest`) also check that:
 - every image gets exactly one out-of-fold prediction;
 - the Streamlit app renders to the end without exceptions.
 
+## What to check in a real project
+
+- **Split by the unit that repeats, not by row.** If a patient, subject, site or scanner appears in many rows, all of its rows belong on one side of the split. Here, splitting rows put every test patient in training and raised the AUC from 0.65 to 0.98.
+- **Check for overlap before you report a score.** Count how many of these units appear in both training and test. In this demo the image-level split had 36–39 of 36–39 test patients in training in every fold; the patient-level split had 0 of 8.
+- **With few units, report the spread, not only the mean.** A patient-level split leaves few patients in each test fold, so fold scores swing. Here each fold tested 8 patients and the fold AUC ranged from 0.545 to 0.743 (0.646 ± 0.095).
+
 ## About the data
 
 - **All data is randomly generated.** There are no real patients, images or records.
