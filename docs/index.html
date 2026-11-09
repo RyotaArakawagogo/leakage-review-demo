@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Patient-level data leakage in an imaging model</title>
+  <meta name="description" content="When one patient has several images, splitting the data by image puts the same patient in both training and test, and the model looks far better than it is. On fully synthetic data, the same model scores AUC 0.98 with an image-level split and 0.65 with a patient-level split.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Patient-level data leakage in an imaging model">
+  <meta property="og:description" content="On fully synthetic data, the same model scores AUC 0.98 with an image-level split and 0.65 with a patient-level split.">
+  <meta property="og:url" content="https://ryotaarakawagogo.github.io/leakage-review-demo/">
+  <meta property="og:image" content="https://ryotaarakawagogo.github.io/leakage-review-demo/screenshots/first-view.png">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #1f2328;
+      --muted: #59636e;
+      --border: #d1d9e0;
+      --accent: #0969da;
+      --accent-fg: #ffffff;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0d1117;
+        --fg: #e6edf3;
+        --muted: #9198a1;
+        --border: #3d444d;
+        --accent: #2f81f7;
+        --accent-fg: #ffffff;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+    }
+    main {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 40px 16px 56px;
+    }
+    h1 {
+      font-size: clamp(1.6rem, 4.5vw, 2.3rem);
+      line-height: 1.25;
+      margin: 0 0 16px;
+    }
+    .lead { font-size: 1.05rem; margin: 0 0 24px; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 0 0 12px;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 18px;
+      border-radius: 6px;
+      border: 1px solid var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+      text-align: center;
+    }
+    .button.primary { background: var(--accent); color: var(--accent-fg); }
+    .button.secondary { color: var(--accent); background: transparent; }
+    .button:hover { filter: brightness(1.1); text-decoration: underline; }
+    .note { color: var(--muted); font-size: 0.92rem; margin: 0 0 32px; }
+    figure { margin: 0 0 32px; }
+    figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+    figcaption { color: var(--muted); font-size: 0.92rem; margin-top: 8px; }
+    .data-note {
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+      margin: 0;
+    }
+    @media (max-width: 480px) {
+      main { padding-top: 24px; }
+      .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Patient-level data leakage in an imaging model</h1>
+    <p class="lead">When one patient has several images, splitting the data by image puts the same patient in both training and test, and the model looks far better than it is. This demo shows the effect on fully synthetic data: the same data and the same model score AUC 0.98 with an image-level split and 0.65 with a patient-level split.</p>
+
+    <div class="actions">
+      <a class="button primary" href="https://leakage-review-demo.streamlit.app/">Open the live app</a>
+      <a class="button secondary" href="https://github.com/RyotaArakawagogo/leakage-review-demo">View the source on GitHub</a>
+    </div>
+    <p class="note">The live app runs on a free hosting service, so if nobody has used it for a while it may take a little time to start.</p>
+
+    <figure>
+      <img src="screenshots/first-view.png" width="1280" height="800" alt="First view of the app: AUC 0.98 with an image-level split and 0.65 with a patient-level split">
+      <figcaption>First view of the app.</figcaption>
+    </figure>
+    <figure>
+      <img src="screenshots/per-patient.png" width="1280" height="439" alt="Mean out-of-fold prediction for each patient under the two splits">
+      <figcaption>Mean prediction for each patient. A cross marks a patient on the wrong side of 0.5.</figcaption>
+    </figure>
+    <figure>
+      <img src="screenshots/review-one-patient.png" width="1280" height="896" alt="Per-image predictions for one selected patient under both splits">
+      <figcaption>Review one patient: per-image predictions from both splits.</figcaption>
+    </figure>
+
+    <p class="data-note">All data is randomly generated and fictional; the demo does not use any actual images.</p>
+  </main>
+</body>
+</html>
