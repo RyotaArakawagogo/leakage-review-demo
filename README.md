@@ -2,7 +2,7 @@
 
 When one patient has several images, splitting the data by image puts the same patient in both training and test, and the model looks far better than it is. This demo shows the effect on fully synthetic data: the same data and the same model score AUC 0.98 with an image-level split and 0.65 with a patient-level split.
 
-**Live demo:** _link to be added after deployment_
+**Live demo:** https://leakage-review-demo.streamlit.app/
 
 ![First view of the app](docs/screenshots/first-view.png)
 
